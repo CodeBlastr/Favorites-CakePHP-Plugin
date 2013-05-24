@@ -15,7 +15,7 @@
  * @package favorites
  * @subpackage favorites.models
  */
-class Favorite extends AppModel {
+class Favorite extends FavoritesAppModel {
 
 /**
  * name
@@ -396,4 +396,3 @@ class Favorite extends AppModel {
 	}
 
 }
-

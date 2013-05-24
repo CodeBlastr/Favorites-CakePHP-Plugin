@@ -15,7 +15,7 @@
  * @package favorites
  * @subpackage favorites.controllers
  */
-class FavoritesController extends AppController {
+class FavoritesController extends FavoritesAppController {
 
 /**
  * Controller name
