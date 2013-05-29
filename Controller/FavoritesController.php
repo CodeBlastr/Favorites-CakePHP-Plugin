@@ -47,7 +47,8 @@ class FavoritesController extends FavoritesAppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		$this->Auth->deny($this->Auth->allowedActions);
-		$types = Configure::read('Favorites.types');
+		$favorites = (unserialize(__FAVORITES_FAVORITES_SETTINGS));
+		$types = $favorites['types'];
 		if (!empty($types)) {
 			$this->favoriteTypes = array();
 			// Keep only key / values (type / model)
@@ -71,14 +72,17 @@ class FavoritesController extends FavoritesAppController {
  */
 	public function add($type = null, $foreignKey = null) {
 		$status = 'error';
+		
 		if (!isset($this->favoriteTypes[$type])) {
 			$message = __d('favorites', 'Invalid object type.');
 		} else {
-			$Subject = ClassRegistry::init($this->favoriteTypes[$type]);
+			
+			$Subject = ClassRegistry::init(ZuhaInflector::pluginize($this->favoriteTypes[$type]) . '.' . $this->favoriteTypes[$type]);
+			
 			$Subject->id = $foreignKey;
-			//$this->Favorite->model = $this->favoriteTypes[$type];
-			$this->Favorite->model = $type;
-			if (!$Subject->exists()) {
+			$this->Favorite->model = $this->favoriteTypes[$type];
+			//$this->Favorite->model = $type;
+			if (!$Subject->useTable && !$Subject->exists()) {
 				$message = __d('favorites', 'Invalid identifier');
 			} else {
 				try {

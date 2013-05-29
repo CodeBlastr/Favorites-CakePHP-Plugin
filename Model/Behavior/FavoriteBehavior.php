@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
  *
@@ -63,6 +64,7 @@ class FavoriteBehavior extends ModelBehavior {
  * @return void
  */
 	public function setup(Model $Model, $settings = array()) {
+		
 		if (!isset($this->settings[$Model->alias])) {
 			$this->settings[$Model->alias] = $this->_defaults;
 		}
@@ -98,7 +100,6 @@ class FavoriteBehavior extends ModelBehavior {
 				}
 			}
 		}
-		debug($this->favoriteTypes);
 	}
 
 /**
@@ -112,8 +113,7 @@ class FavoriteBehavior extends ModelBehavior {
  * @return boolean success of save Returns true if the favorite record already exists.
  */
 	public function saveFavorite(Model $Model, $userId, $modelName, $type, $foreignKey) {
-		debug($userId);
-	
+		
 		if (method_exists($Model, 'beforeSaveFavorite')) {
 			$result = $Model->beforeSaveFavorite(array('id' => $foreignKey, 'userId' => $userId, 'model' => $modelName, 'type' => $type));
 			if (!$result) {
