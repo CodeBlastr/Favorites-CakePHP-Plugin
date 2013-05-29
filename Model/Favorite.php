@@ -103,7 +103,6 @@ class Favorite extends FavoritesAppModel {
 			'conditions' => array(
 				$this->alias . '.user_id' => $userId,
 				$this->alias . '.type' => $options['type'],
-				$this->alias . '.model' => $this->_getSupported('types', $options)
 			),
 			'order' => $this->alias . '.position ASC',
 			'contain' => $this->_getSupported('contain', $options)
@@ -124,7 +123,8 @@ class Favorite extends FavoritesAppModel {
  * @access public
  */
 	public function getAllFavorites($id = null, $options = array()) {
-		$keys = array_keys(Configure::read('Favorites.types'));
+		$favorites = (unserialize(__FAVORITES_FAVORITES_SETTINGS));
+		$keys = array_keys($favorites['types']);
 		$result = array_fill_keys($keys, array());
 		if (!is_null($id)) {
 			$list = $this->getFavorites($id, array('type' => $keys) + $options);

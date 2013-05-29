@@ -68,9 +68,11 @@ class FavoritesHelper extends AppHelper {
  * @param array $options Options for the Html->link method
  * @return string Correct Html link
  */
-	public function toggleFavorite($type, $id, $addText = null, $removeText = null, $options = array()) {
+	public function toggleFavorite($type, $id, $addText = null, $removeText = null, $options = array(), $userFavorites = array()) {
 		$favorites = (unserialize(__FAVORITES_FAVORITES_SETTINGS));
 		$_defaultTexts = $favorites['types'];
+		//Need to do it this way Before Render doens't work
+		$this->_userFavorites = $userFavorites;
 		$link = '';
 		$type = strtolower($type);
 		if (!array_key_exists($type, $_defaultTexts)) {
@@ -85,7 +87,6 @@ class FavoritesHelper extends AppHelper {
 				$options['class'] = '';
 			}
 			$options['class'] = $type . ' ' . $options['class'];
-
 			$remove = array_key_exists($type, $this->_userFavorites) && in_array($id, $this->_userFavorites[$type]);
 			if ($remove) {
 				$url = array_merge($this->favoriteLinkBase, array(
