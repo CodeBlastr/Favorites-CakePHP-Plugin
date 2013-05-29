@@ -98,6 +98,7 @@ class FavoriteBehavior extends ModelBehavior {
 				}
 			}
 		}
+		debug($this->favoriteTypes);
 	}
 
 /**

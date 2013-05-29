@@ -69,7 +69,8 @@ class FavoritesHelper extends AppHelper {
  * @return string Correct Html link
  */
 	public function toggleFavorite($type, $id, $addText = null, $removeText = null, $options = array()) {
-		$_defaultTexts = Configure::read('Favorites.defaultTexts');
+		$favorites = (unserialize(__FAVORITES_FAVORITES_SETTINGS));
+		$_defaultTexts = $favorites['types'];
 		$link = '';
 		$type = strtolower($type);
 		if (!array_key_exists($type, $_defaultTexts)) {
