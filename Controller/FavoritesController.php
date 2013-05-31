@@ -82,7 +82,7 @@ class FavoritesController extends FavoritesAppController {
 			$Subject->id = $foreignKey;
 			$this->Favorite->model = $this->favoriteTypes[$type];
 			//$this->Favorite->model = $type;
-			if (!$Subject->useTable && !$Subject->exists()) {
+			if (!$Subject->exists()) {
 				$message = __d('favorites', 'Invalid identifier');
 			} else {
 				try {
