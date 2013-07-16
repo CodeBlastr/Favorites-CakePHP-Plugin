@@ -1,5 +1,12 @@
 <?php
 /**
+ * Place at top of extended controller
+ * $refuseInit = true; require_once(ROOT.DS.'app'.DS.'Plugin'.DS.'Favorites'.DS.'Controller'.DS.'FavoritesController.php');
+ * 
+ */
+ 
+ 
+/**
  * Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
  *
  * Licensed under The MIT License
@@ -15,7 +22,7 @@
  * @package favorites
  * @subpackage favorites.controllers
  */
-class FavoritesController extends FavoritesAppController {
+class _FavoritesController extends FavoritesAppController {
 
 /**
  * Controller name
@@ -122,7 +129,7 @@ class FavoritesController extends FavoritesAppController {
 		} else {
 			$message = __d('favorites', 'Unable to delete favorite, please try again');
 		}
-
+		
 		$this->set(compact('status', 'message'));
 		return $this->redirect($this->referer(), -999);
 	}
@@ -174,7 +181,7 @@ class FavoritesController extends FavoritesAppController {
 		$status = 'error';
 		$direction = strtolower($direction);
 		if (($message = $this->_isOwner($id)) !== true) {
-			// Message defined
+			
 		} else if ($direction !== 'up' && $direction !== 'down') {
 			$message = __d('favorites', 'Invalid direction');
 		} else if ($this->Favorite->move($id, $direction)) {
@@ -183,7 +190,6 @@ class FavoritesController extends FavoritesAppController {
 		} else {
 			$message = __d('favorites', 'Unable to change favorite position, please try again');
 		}
-
 		$this->set(compact('status', 'message'));
 		return $this->redirect($this->referer());
 	}
@@ -237,4 +243,8 @@ class FavoritesController extends FavoritesAppController {
 		}
 		return true;
 	}
+}
+
+if (!isset($refuseInit)) {
+    class FavoritesController extends _FavoritesController {}
 }
