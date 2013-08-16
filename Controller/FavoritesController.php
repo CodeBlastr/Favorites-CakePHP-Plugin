@@ -83,11 +83,17 @@ class _FavoritesController extends FavoritesAppController {
 		if (!isset($this->favoriteTypes[$type])) {
 			$message = __d('favorites', 'Invalid object type.');
 		} else {
+		    
+            $model = $this->favoriteTypes[$type];
+            
+            if($this->favoriteTypes[$type] == 'Feed') {
+                 $model = $model.ucfirst(array_pop(explode('__', $foreignKey)));
+            }
 			
-			$Subject = ClassRegistry::init(ZuhaInflector::pluginize($this->favoriteTypes[$type]) . '.' . $this->favoriteTypes[$type]);
+			$Subject = ClassRegistry::init(ZuhaInflector::pluginize($model) . '.' . $model);
 			
 			$Subject->id = $foreignKey;
-			$this->Favorite->model = $this->favoriteTypes[$type];
+			$this->Favorite->model = $model;
 			//$this->Favorite->model = $type;
 			if (!$Subject->exists()) {
 				$message = __d('favorites', 'Invalid identifier');
