@@ -22,7 +22,7 @@
  * @package favorites
  * @subpackage favorites.controllers
  */
-class _FavoritesController extends FavoritesAppController {
+class AppFavoritesController extends FavoritesAppController {
 
 /**
  * Controller name
@@ -252,5 +252,5 @@ class _FavoritesController extends FavoritesAppController {
 }
 
 if (!isset($refuseInit)) {
-    class FavoritesController extends _FavoritesController {}
+    class FavoritesController extends AppFavoritesController {}
 }
