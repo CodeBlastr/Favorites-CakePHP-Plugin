@@ -85,7 +85,6 @@ class AppFavoritesController extends FavoritesAppController {
 		} else {
 		    
             $model = $this->favoriteTypes[$type];
-            
             if($this->favoriteTypes[$type] == 'Feed') {
                  $model = $model.ucfirst(array_pop(explode('__', $foreignKey)));
             }
@@ -115,7 +114,8 @@ class AppFavoritesController extends FavoritesAppController {
 		if (!empty($this->request->params['isJson'])) {
 			return $this->render();
 		} else {
-			return $this->redirect($this->referer());
+			$this->Session->setFlash($message);
+			$this->redirect($this->referer());
 		}
 	}
 
@@ -131,13 +131,14 @@ class AppFavoritesController extends FavoritesAppController {
 			// Message defined
 		} else if ($this->Favorite->deleteRecord($id)) {
 			$status = 'success';
-			$message = __d('favorites', 'Record removed from list');
+			$message = __d('favorites', 'Removed');
 		} else {
-			$message = __d('favorites', 'Unable to delete favorite, please try again');
+			$message = __d('favorites', 'Error, please try again');
 		}
 		
 		$this->set(compact('status', 'message'));
-		return $this->redirect($this->referer(), -999);
+		$this->Session->setFlash($message);
+		$this->redirect($this->referer(), -999);
 	}
 
 /**

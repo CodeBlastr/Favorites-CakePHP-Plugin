@@ -71,7 +71,7 @@ class FavoritesHelper extends AppHelper {
 	public function toggleFavorite($type, $id, $addText = null, $removeText = null, $options = array(), $userFavorites = array()) {
 		$favorites = (unserialize(__FAVORITES_FAVORITES_SETTINGS));
 		$_defaultTexts = $favorites['types'];
-		//Need to do it this way Before Render doens't work
+		//Need to do it this way Before Render doesn't work
 		$this->_userFavorites = $userFavorites;
 		$link = '';
 		$type = strtolower($type);
