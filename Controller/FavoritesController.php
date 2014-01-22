@@ -101,12 +101,12 @@ class AppFavoritesController extends FavoritesAppController {
 					$result = $Subject->saveFavorite($this->Session->read('Auth.User.id'), $Subject->name, $type, $foreignKey);
 					if ($result) {
 						$status = 'success';
-						$message = __d('favorites', 'Record was successfully added');
+						$message = __d('favorites', 'Successfully added');
 					} else {
-						$message = __d('favorites', 'Record was not added.');
+						$message = __d('favorites', 'Could not be added');
 					}
 				} catch (Exception $e) {
-					$message = __d('favorites', 'Record was not added.') . ' ' . $e->getMessage();
+					$message = __d('favorites', 'Could not be added') . ' ' . $e->getMessage();
 				}
 			}
 		}
@@ -243,10 +243,10 @@ class AppFavoritesController extends FavoritesAppController {
 		$favorite = $this->Favorite->read();
 		$this->Favorite->model = $favorite['Favorite']['model'];
 		if (empty($favorite)) {
-			return __d('favorites', 'That record does not exist.');
+			return __d('favorites', 'Does not exist.');
 		}
 		if ($favorite['Favorite']['user_id'] != $this->Session->read('Auth.User.id')) {
-			return __d('favorites', 'That record does not belong to you.');
+			return __d('favorites', 'That does not belong to you.');
 		}
 		return true;
 	}
