@@ -12,32 +12,22 @@ Favorites plugin allows to associate users to any record in your database throug
 		cake schema create --plugin Favorites --name favorites
 		cake Migrations.migration run all --plugin Favorites
 
-3. This plugin requires that you setup some parameters in global Configure storage:
+ 3. This plugin requires that you setup some parameters in global Configure storage:
  1. `Favorites.types contains supported objects that allowed to be stored as favorites.
  2. `Favorites.modelCategories allow to list all models and required contains for it.
  3. `Favorites.defaultTexts sets the default text for the helper toggleFavorite method
 
-Example:
+## Configure ##
 
-	Configure::write('Favorites.types', array('post' => 'Blogs.Post', 'link' => 'Link'));
-	Configure::write('Favorites.defaultTexts', array('favorite' => __('Favorite it', true), 'watch' => __('Watch it', true)));
-	Configure::write('Favorites.modelCategories', array('Post', 'Link'));
+1. Go to your-site.tld/admin/settings 
+2. Add a value to __FAVORITES_FAVORITE_SETTINGS
 
-Or you could use the Configure::load() method to load a configuration file that has content similar to that below:
-
-	$config['Favorites'] = array(
-		'types' => array(
-			'favorite' => 'Post',
-			'watch' => 'Post'
-		),
-		'defaultTexts' => array(
-			'favorite' => __('Favorite it', true),
-			'watch' => __('Watch it', true)
-		),
-		'modelCategories' => array(
-			'Post'
-		)
-	);
+ex.
+	types[favorite] = "Post"
+	types[watch] = "Post"
+	defaultTexts[favorite] = "Favorite it"
+	defaultTexts[watch] = "Watch it"
+	modelCategories[] = "Post"
 
 ## Usage ##
 
@@ -51,31 +41,35 @@ Attach the Favorite behavior to your models via the `$actsAs` variable or dynami
 	// Or
 	$this->Behaviors->attach('Favorites.Favorite');
 
-Use the favourites helper in your views to generate links to mark a model record as favorite:
-
-	<?php echo $this->Favorites->toggleFavorite('favorite-type', $modelId);
-
-This link will toggle the "favorite-type" tag for this user and model record.
-
-If you want the helper to distinguish whether it needs to activate or deactivate the favorite flag in for the user, you need to pass to the view the variable `userFavorites` containing an associative array of user favorites per favorite type. The following structure is needed:
-
-	array(
-		'favorite-type1' => array(
-			'favorite-id1' => 'model-foreignKey-1',
-			'favorite-id2' => 'model-foreignKey-3'
-			'favorite-id3' => 'model-foreignKey-2'
-		),
-		'favorite-type2' => array(
-			'favorite-id4' => 'model-foreignKey-1',
-			'favorite-id5' => 'model-foreignKey-3'
-			'favorite-id6' => 'model-foreignKey-2'
-		)
-	);
-
-You can achieve this result using with method `getAllFavorites` in `Favorite` model:
+You can achieve this result using with method `getAllFavorites` in `Favorite` model :
 
 	$Favorite = ClassRegistry::init('Favorites.favorite');
-	$this->set('userFavorites', $Favorite->getAllFavorites('user-id'));	
+	$this->set('userFavorites', $Favorite->getAllFavorites($this->Session->read('Auth.User.id')));
+
+You can then show the link to toggle a record as favorite with this FavoritesHelper generated link : 
+
+	<?php echo $this->Favorites->toggleFavorite('watch', $property['Property']['id'], 'Add to watchlist', 'Remove from watchlist', array('class' => 'btn btn-default'), $userFavorites);
+	
+Example function you might use to list favorites 
+```
+/**
+ * List of properties you're watching (have favorited) 
+ */
+	public function watch() {
+		$this->paginate = array(
+			'joins' => array(array(
+					'table' => 'favorites',
+			        'alias' => 'Favorite',
+			        'type' => 'INNER',
+			        'conditions' => array(
+			            'Favorite.foreign_key = Property.id',
+			            'Favorite.user_id' => $this->Session->read('Auth.User.id')
+			        )
+			    ))
+			);
+		$this->set('properties', $properties = $this->paginate());
+	}
+```
 
 ## Configuration Options ##
 
@@ -100,10 +94,25 @@ Additionally the behavior provides two callbacks to implement in your model:
 * PHP version: PHP 5.2+
 * CakePHP version: 2.x Stable
 
-## Requirements ##
+## Side Notes ##
 
-* PHP version: PHP 5.2+
-* CakePHP version: Cakephp 2.x Stable
+<?php echo $this->Favorites->toggleFavorite('favorite-type1', $property['Property']['id'], 'Add to watchlist', 'Remove from watchlist', array('class' => 'btn btn-default'), $userFavorites);
+ will toggle the "favorite-type1" tag for this user and model record.
+
+If you want the helper to distinguish whether it needs to activate or deactivate the favorite flag in for the user, you need to pass to the view the variable `userFavorites` containing an associative array of user favorites per favorite type. The following structure is needed:
+
+	array(
+		'favorite-type1' => array(
+			'favorite-id1' => 'model-foreignKey-1',
+			'favorite-id2' => 'model-foreignKey-3'
+			'favorite-id3' => 'model-foreignKey-2'
+		),
+		'favorite-type2' => array(
+			'favorite-id4' => 'model-foreignKey-1',
+			'favorite-id5' => 'model-foreignKey-3'
+			'favorite-id6' => 'model-foreignKey-2'
+		)
+	);
 
 ## Support ##
 
