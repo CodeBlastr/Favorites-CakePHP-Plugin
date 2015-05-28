@@ -88,7 +88,7 @@ class UsersController extends AppUsersController {
 		$Favorite = ClassRegistry::init('Favorites.favorite');
 		$favorites = $Favorite->getAllFavorites($this->Session->read('Auth.User.id'));
 		$BlogPost = ClassRegistry::init('Blogs.BlogPost');
-		$favorites = $BlogPost->find('all', array('conditions' => array('BlogPost.id' => $favorites['favorite'])));
+		$this->set('favorites', $favorites = $BlogPost->find('all', array('conditions' => array('BlogPost.id' => $favorites['favorite']))));
 	}
 }
 ```
