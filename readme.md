@@ -79,28 +79,22 @@ class BlogPostsController extends AppBlogPostsController {
 <?php echo $this->Favorites->toggleFavorite('favorite', $blogPost['BlogPost']['id'], 'Add to favorites', 'Remove from favorites', array('class' => 'btn btn-default'), $userFavorites);
 ```
 
-
 	
 Example function you might use to list favorites 
 ```
-/**
- * List of properties you're watching (have favorited) 
- */
-	public function watch() {
-		$this->paginate = array(
-			'joins' => array(array(
-					'table' => 'favorites',
-			        'alias' => 'Favorite',
-			        'type' => 'INNER',
-			        'conditions' => array(
-			            'Favorite.foreign_key = Property.id',
-			            'Favorite.user_id' => $this->Session->read('Auth.User.id')
-			        )
-			    ))
-			);
-		$this->set('properties', $properties = $this->paginate());
+class UsersController extends AppUsersController {
+	public function view($id = null) {
+		// get their favorite articles
+		$Favorite = ClassRegistry::init('Favorites.favorite');
+		$favorites = $Favorite->getAllFavorites($this->Session->read('Auth.User.id'));
+		$BlogPost = ClassRegistry::init('Blogs.BlogPost');
+		$favorites = $BlogPost->find('all', array('conditions' => array('BlogPost.id' => $favorites['favorite'])));
 	}
+}
 ```
+
+
+# Everything after this is not required to know how to use this plugin. 
 
 ## Configuration Options ##
 
