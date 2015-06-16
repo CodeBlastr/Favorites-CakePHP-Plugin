@@ -4,72 +4,97 @@ Version 1.1
 
 Favorites plugin allows to associate users to any record in your database through human readable tags or categories.
 
-## Installation ##
+## Zuha Installation ##
 
-1. Place the favorites folder into any of your plugin directories for your app (for example `app/Plugin` or `root_dir/plugins`)
-2. Create the required database tables using either the schema shell or the migrations plugin:
+ - Login as the admin and go to [yoursite.com]/admin/settings 
+ - Add a value to __FAVORITES_FAVORITE_SETTINGS
 
-		cake schema create --plugin Favorites --name favorites
-		cake Migrations.migration run all --plugin Favorites
+ex 1.
+```
+types[favorite] = "BlogPost"
+defaultTexts[favorite] = "Favorite it"
+modelCategories[] = "Blogs"
+```
 
- 3. This plugin requires that you setup some parameters in global Configure storage:
- 1. `Favorites.types contains supported objects that allowed to be stored as favorites.
- 2. `Favorites.modelCategories allow to list all models and required contains for it.
- 3. `Favorites.defaultTexts sets the default text for the helper toggleFavorite method
+ex 2.
+```
+types[favorite] = "Post"
+types[watch] = "Post"
+defaultTexts[favorite] = "Favorite it"
+defaultTexts[watch] = "Watch it"
+modelCategories[] = "Post"
+```
 
-## Configure ##
+ -  Attach the behavior to your model that you will be favoriting.
 
-1. Go to your-site.tld/admin/settings 
-2. Add a value to __FAVORITES_FAVORITE_SETTINGS
+ex 1. 
+```
+class BlogPost extends AppBlogPost {
+	// order is important
+	public function __construct($id = false, $table = null, $ds = null) {
+		if (CakePlugin::loaded('Favorites')) {
+            		$this->actsAs[] = 'Favorites.Favorite';
+        	}
+		parent::__construct($id, $table, $ds);
+	}
+}
+```
+ - Add the Helper to your Controller
 
-ex.
-	types[favorite] = "Post"
-	types[watch] = "Post"
-	defaultTexts[favorite] = "Favorite it"
-	defaultTexts[watch] = "Watch it"
-	modelCategories[] = "Post"
+ex 1. 
+```
+public function __construct($request = null, $response = null) {
+	// order is important
+	if (CakePlugin::loaded('Favorites')) {
+		$this->helpers[] = 'Favorites.Favorites';
+	}
+	parent::__construct($request, $response);
+}
+```
 
-## Usage ##
+ - Get the user's favorites by adding the following to the action where the Toggle Button will show. 
 
-Add the Favorites helper to your controller:
+ex. 1
+```
+class BlogPostsController extends AppBlogPostsController {
+	public function view($id) {
+		parent::view($id);
+		
+		// get their favorite articles
+		$Favorite = ClassRegistry::init('Favorites.Favorite');
+		$this->set('userFavorites', $userFavorites = $Favorite->getAllFavorites($this->Session->read('Auth.User.id')));
+	}
+}
+```
+ - You can now show the link to toggle a record as favorite with this FavoritesHelper generated link : 
+	 - **IMPORTANT - You WILL need to edit this code.** 
+	 - param 1 = types['watch'] from the config step
+	 - param 2 = the foreign key that you want to add to favorites
+	 - param 3 = Text of link when adding a favorite.
+	 - param 4 = Text of link when removing a favorite.
+	 - param 5 = link options
+	 - param 6 = the data, so that this link can decide which link to show
+	
+```
+<?php echo $this->Favorites->toggleFavorite('favorite', $blogPost['BlogPost']['id'], 'Add to favorites', 'Remove from favorites', array('class' => 'btn btn-default'), $userFavorites);
+```
 
-	public $helpers = array('Favorites.Favorites');
-
-Attach the Favorite behavior to your models via the `$actsAs` variable or dynamically using the `BehaviorsCollection` object methods:
-
-	public $actsAs = array('Favorites.Favorite');
-	// Or
-	$this->Behaviors->attach('Favorites.Favorite');
-
-You can achieve this result using with method `getAllFavorites` in `Favorite` model :
-
-	$Favorite = ClassRegistry::init('Favorites.favorite');
-	$this->set('userFavorites', $Favorite->getAllFavorites($this->Session->read('Auth.User.id')));
-
-You can then show the link to toggle a record as favorite with this FavoritesHelper generated link : 
-
-	<?php echo $this->Favorites->toggleFavorite('watch', $property['Property']['id'], 'Add to watchlist', 'Remove from watchlist', array('class' => 'btn btn-default'), $userFavorites);
 	
 Example function you might use to list favorites 
 ```
-/**
- * List of properties you're watching (have favorited) 
- */
-	public function watch() {
-		$this->paginate = array(
-			'joins' => array(array(
-					'table' => 'favorites',
-			        'alias' => 'Favorite',
-			        'type' => 'INNER',
-			        'conditions' => array(
-			            'Favorite.foreign_key = Property.id',
-			            'Favorite.user_id' => $this->Session->read('Auth.User.id')
-			        )
-			    ))
-			);
-		$this->set('properties', $properties = $this->paginate());
+class UsersController extends AppUsersController {
+	public function view($id = null) {
+		// get their favorite articles
+		$Favorite = ClassRegistry::init('Favorites.favorite');
+		$favorites = $Favorite->getAllFavorites($this->Session->read('Auth.User.id'));
+		$BlogPost = ClassRegistry::init('Blogs.BlogPost');
+		$this->set('favorites', $favorites = $BlogPost->find('all', array('conditions' => array('BlogPost.id' => $favorites['favorite']))));
 	}
+}
 ```
+
+
+# Everything after this is not required to know how to use this plugin. 
 
 ## Configuration Options ##
 
@@ -101,6 +126,7 @@ Additionally the behavior provides two callbacks to implement in your model:
 
 If you want the helper to distinguish whether it needs to activate or deactivate the favorite flag in for the user, you need to pass to the view the variable `userFavorites` containing an associative array of user favorites per favorite type. The following structure is needed:
 
+```
 	array(
 		'favorite-type1' => array(
 			'favorite-id1' => 'model-foreignKey-1',
@@ -113,24 +139,5 @@ If you want the helper to distinguish whether it needs to activate or deactivate
 			'favorite-id6' => 'model-foreignKey-2'
 		)
 	);
+```
 
-## Support ##
-
-For support and feature request, please visit the [Favorites Plugin Support Site](http://cakedc.lighthouseapp.com/projects/59901-favourites-plugin/).
-
-For more information about our Professional CakePHP Services please visit the [Cake Development Corporation website](http://cakedc.com).
-
-## License ##
-
-Copyright 2009-2012, [Cake Development Corporation](http://cakedc.com)
-
-Licensed under [The MIT License](http://www.opensource.org/licenses/mit-license.php)<br/>
-Redistributions of files must retain the above copyright notice.
-
-## Copyright ###
-
-Copyright 2009-2012<br/>
-[Cake Development Corporation](http://cakedc.com)<br/>
-1785 E. Sahara Avenue, Suite 490-423<br/>
-Las Vegas, Nevada 89104<br/>
-http://cakedc.com<br/>
