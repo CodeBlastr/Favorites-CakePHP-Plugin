@@ -67,7 +67,7 @@ class AppFavoritesController extends FavoritesAppController {
 				}
 			}
 		}
-		$this->set('authMessage', __d('favorites', 'Authentication required'));
+		$this->set('authMessage', __d('favorites', 'Authentication is required'));
 	}
 
 /**
